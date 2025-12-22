@@ -27,6 +27,12 @@ export default function Layout() {
           title: "Impressora em Rede"
         }}
       />
+      <Stack.Screen
+        name="pdv/pdv_printer"
+        options={{
+          title: "Impressora PDV"
+        }}
+      />
     </Stack>
   )
 }

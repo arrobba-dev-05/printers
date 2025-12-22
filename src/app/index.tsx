@@ -31,11 +31,20 @@ export default function Index() {
           USB
         </Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => router.navigate("/pdv/pdv_printer")}
+
+      >
+        <Text style={styles.text_button}>
+          PDV
+        </Text>
+      </TouchableOpacity>
     </View>
   )
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 50, gap: 15 },
+  container: { flex: 1, padding: 50, gap: 15 },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
   item: {
     padding: 15,
