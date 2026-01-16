@@ -50,12 +50,29 @@ export default function Ble_Printer() {
       return;
     }
     try {
-      global.Buffer = global.Buffer || Buffer;
-
-      // const ESCPOS = Buffer.from(PRINT_64).toString("base64")
       RNBLEPrinter.printRawData(PRINT_64, (error: Error) =>
         Alert.alert("Erro", JSON.stringify(error, null, 2))
       );
+    } catch (error) {
+      Alert.alert("Erro", "Falha ao imprimir: " + error);
+    }
+  }
+  async function printCupon() {
+    if (!connectedPrinter) {
+      Alert.alert("Erro", "Conecte-se a uma impressora primeiro.");
+      return;
+    }
+    try {
+      BLEPrinter.printText(`
+         <C><B>LOJA EXEMPLO</B></C>
+      <C>-------------------</C>
+      Produto 1        10,00
+      Produto 2        15,00
+      <C>-------------------</C>
+      <R>Total: 25,00</R>
+      <C><B>Obrigado pela preferência!</B></C>
+       <C>-------------------</C>  
+      `, { encoding: "UTF8", beep: false, cut: false, tailingLine: false })
     } catch (error) {
       Alert.alert("Erro", "Falha ao imprimir: " + error);
     }
@@ -102,6 +119,15 @@ export default function Ble_Printer() {
             Testar Impressão
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={printCupon}
+
+        >
+          <Text style={styles.text_button}>
+            Imprimir cupom
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -126,14 +152,15 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   boottom: {
-    width: "100%"
+    width: "100%",
+    gap: 12
   },
   button: {
     borderRadius: 10,
     padding: 15,
     backgroundColor: "#1F488A",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   text_button: {
     color: "white",
