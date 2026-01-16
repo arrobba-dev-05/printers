@@ -1,6 +1,9 @@
+import { PRINT_64 } from "@/constants/escpos";
+import { Buffer } from "buffer";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
+  NativeModules,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -8,6 +11,8 @@ import {
 } from "react-native";
 
 import { INetPrinter, NetPrinter } from "react-native-thermal-receipt-printer";
+
+const RNNetPrinter = NativeModules.RNNetPrinter;
 
 export default function Net_Printer() {
   const [printers, setPrinters] = useState<INetPrinter[]>([]);
@@ -20,7 +25,12 @@ export default function Net_Printer() {
         // Lista fixa de impressoras (pode vir de API futuramente)
         setPrinters([
           {
-            device_name: "Impressora Caixa",
+            device_name: "Elgin I9",
+            host: "192.168.100.202",
+            port: 9100,
+          },
+          {
+            device_name: "Bematch",
             host: "192.168.100.250",
             port: 9100,
           },
@@ -41,14 +51,29 @@ export default function Net_Printer() {
       Alert.alert("Erro", "Não foi possível conectar à impressora");
     }
   };
+  const disconnectPrinter = async () => {
+    try {
+      await NetPrinter.closeConn();
+      Alert.alert("Conexão encerrada", "Conexão encerrada com sucesso!");
+    } catch (error) {
+      console.warn(error);
+      Alert.alert("Erro", "Não foi possível conectar à impressora");
+    }
+  };
 
   const printTextTest = () => {
     if (!currentPrinter) {
       Alert.alert("Aviso", "Conecte uma impressora primeiro");
       return;
     }
+    global.Buffer = global.Buffer || Buffer;
 
-    NetPrinter.printText("<C>Teste de impressao</C>\n");
+    // const ESCPOS = Buffer.from(PRINT_64).toString("base64")
+    RNNetPrinter.printRawData(PRINT_64, (error: Error) =>
+      Alert.alert("Erro", JSON.stringify(error, null, 2))
+    );
+
+    // NetPrinter.printText("<C>Teste de impressao</C>\n");
   };
 
   const printBillTest = () => {
@@ -91,6 +116,9 @@ export default function Net_Printer() {
 
       <TouchableOpacity style={styles.button} onPress={printBillTest}>
         <Text style={styles.text_button}>Imprimir Cupom</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={disconnectPrinter}>
+        <Text style={styles.text_button}>Desconectar</Text>
       </TouchableOpacity>
     </View>
   );

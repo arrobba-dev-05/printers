@@ -1,7 +1,11 @@
+import { PRINT_64 } from '@/constants/escpos';
 import { connectPrinter, requestPermissions } from '@/functions/handleBlePrinter';
 import { useEffect, useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, NativeModules, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { BLEPrinter, IBLEPrinter } from 'react-native-thermal-receipt-printer';
+
+const RNBLEPrinter = NativeModules.RNBLEPrinter;
+
 
 export default function Ble_Printer() {
   const [devices, setDevices] = useState<IBLEPrinter[]>([]);
@@ -46,7 +50,12 @@ export default function Ble_Printer() {
       return;
     }
     try {
-      await BLEPrinter.printText("=== TESTE DE IMPRESSAO ===\n");
+      global.Buffer = global.Buffer || Buffer;
+
+      // const ESCPOS = Buffer.from(PRINT_64).toString("base64")
+      RNBLEPrinter.printRawData(PRINT_64, (error: Error) =>
+        Alert.alert("Erro", JSON.stringify(error, null, 2))
+      );
     } catch (error) {
       Alert.alert("Erro", "Falha ao imprimir: " + error);
     }
